@@ -80,8 +80,6 @@ if True:  # stupid VSCode formatting thing
 # ------------------------------- Utilities
 
 # ------------------------------- GENERAL CONSTANTS
-__version__ = '1.0.1'
-VERSION = tuple(map(int, __version__.split('.')))
 
 
 class GIX_STC:  # @v --> Structural Thinking Comments
