@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 """
-Usage: err [OPTION]... N
+Usage:
+    err [OPTION]... N
 
-  -n, --quiet, --silent     suppress most output
-  -d, --debug               annotate program execution
-  -o file, --output=file    send output to this file
-  -l N, --line-length=N     specify the desired line-wrap length
-  -z, --null-data           separate lines by NUL characters
-  --help                    display this help and exit
-  --version                 output version information and exit
+Options:
+    -n, --quiet, --silent     suppress most output
+    -d, --debug               annotate program execution
+    -o file, --output=file    send output to this file
+    -l N, --line-length=N     specify the desired line-wrap length
+    -z, --null-data           separate lines by NUL characters
+    --help                    display this help and exit
+    --version                 output version information and exit
 
 
 
@@ -62,6 +64,7 @@ sentry_sdk.init(release="as-anansi@0.3.0")
 class CLI():
     """ Command line interface with argument parsing, default values, and """
     from sys import argv
+    from docopt import docopt
     # defaults setup from common CLI interfaces
     DEFAULT_ARGS: Dict[str, List[Sequence[str]]] = {
         "debug": [
@@ -87,6 +90,8 @@ class CLI():
 
     def __init__(self, args):
         super().__init__()
+        args = docopt(__doc__, version=f'AutoSys {__version__}')
+
         ARGS = self.DEFAULT_ARGS
 
     @classmethod
