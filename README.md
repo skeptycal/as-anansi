@@ -1,14 +1,29 @@
 # AutoSys - Anansi
 
->as-anansi.py - Tricky and fun ansi text utilities for python programs. The obligatory ANSI CLI module from the Python system utilities package [AutoSys](https://pypi.org/project/autosys/)
+Tricky and fun ansi text utilities for python programs. The obligatory ANSI CLI module from the Python system utilities package [AutoSys](https://pypi.org/project/autosys/)
 
 ---
 
-[![Build Status](https://travis-ci.com/skeptycal/autosys.svg?branch=master)](https://travis-ci.com/skeptycal/autosys) ![https://pypi.python.org/pypi/autosys](http://img.shields.io/pypi/v/autosys.svg?style=flat) ![https://pypi.python.org/pypi/autosys](https://img.shields.io/pypi/wheel/autosys.svg)
+[![netlify badge](https://api.netlify.com/api/v1/badges/416b8ca3-82db-470f-9adf-a6d06264ca75/deploy-status)](https://app.netlify.com/sites/mystifying-keller-ab5658/deploys) [![Build Status](https://travis-ci.com/skeptycal/autosys.svg?branch=master)](https://travis-ci.com/skeptycal/autosys)
+
+![https://pypi.python.org/pypi/autosys](http://img.shields.io/pypi/v/autosys.svg?color=Yellow&style=popout) ![https://pypi.python.org/pypi/autosys](https://img.shields.io/pypi/wheel/autosys.svg) ![PyPI - Status](https://img.shields.io/pypi/status/autosys.svg)
 
 ![https://pypi.python.org/pypi/autosys](https://img.shields.io/badge/test_coverage-100%25-6600CC.svg) ![https://pypi.python.org/pypi/autosys](https://img.shields.io/badge/branch_coverage-100%25-6600CC.svg)
 
+[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v1.4%20adopted-ff69b4.svg)](code-of-conduct.md) [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
+
+![Twitter Follow](https://img.shields.io/twitter/follow/skeptycal.svg?label=%40skeptycal&style=social) ![GitHub followers](https://img.shields.io/github/followers/skeptycal.svg?style=social)
+
+
 ## Getting Started
+
+### AutoSys - System utilities for Python on macOS
+
+- Setup and maintain python repos automatically
+- Automate web access, blog updates, social media
+- Collect and analyze data sets efficiently
+- Create vivid and descriptive visualizations of data
+- Use Python to interact with compiled languages and devops tools
 
 ### Documentation
 
@@ -22,39 +37,40 @@ Autosys requires the following:
 - Python 3.8+ (or 3.6+ with fstrings library)
 _No external libraries are required for basic functionality._
 
-| Optional Features                           | Requirements                                                     |
-| ------------------------------------------- | ---------------------------------------------------------------- |
-| Web scraping / url parsing                  | [Requests: HTTP for Humans™](https://pypi.org/project/requests/) |
-| YAML serialization                          | [PyYAML](https://pypi.org/project/PyYAML/)                       |
-| ultra fast JSON                             | [ujson](https://pypi.org/project/ujson/)                         |
-| data wrangling; array computing with Python | [numpy](https://pypi.org/project/numpy/)                         |
-| Fortran Interoperability & Paralellization  | numpy, [GNU Fortran 7+](http://hpc.sourceforge.net/#fortran)     |
-| GO Interoperability                         | go1.12                                                           |
-| database support                            | PostgreSQL, MySQL, ODBC driver                                   |
+| Optional Features          | Requirements                                                     |
+| -------------------------- | ---------------------------------------------------------------- |
+| Web scraping / url parsing | [Requests: HTTP for Humans™](https://pypi.org/project/requests/) |
+| YAML serialization         | [PyYAML](https://pypi.org/project/PyYAML/)                       |
+| ultra fast JSON            | [ujson](https://pypi.org/project/ujson/)                         |
+| data wrangling; vectors    | [numpy](https://pypi.org/project/numpy/)                         |
+| data visualization         | D3, Seaborn, Bokeh, Vegas                                        |
+| framework interaction      | Flask, Vue / Nuxt                                                |
+| Fortran Interoperability   | numpy, [GNU Fortran 7+](http://hpc.sourceforge.net/#fortran)     |
+| GO Interoperability        | go1.12                                                           |
+| database support           | drivers for MySQL, MongoDB, etc                                  |
 
 _macOS specific information:_
 
-- many optional features require Apple's XCode Tools (installed from the Mac App Store)
-- On 10.9 Mavericks or higher, you can get the command-line tools by simply typing xcode-select --install.
-- And on Catalina, you may have to specifify the following additional include path for the compiler to find the system headers.
+- *many optional features require Apple's XCode Tools (installed from the Mac App Store)*
+- *On 10.9 Mavericks or higher, you can get the command-line tools by simply typing xcode-select --install.*
+- _And on Catalina, you may have to specifify the following additional include path for the compiler to find the system headers:_
 
-```sh
--I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include
-```
+
+        -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include
 
 ## Installing
 
-```sh
-# installing GNU computation tools: gcc, c++, and gfortran
 
-# Homebrew install (macOS)
-brew cask install gcc gfortran
+        # installing GNU computation tools: gcc, c++, and gfortran
 
-# direct install (macOS / linux)
-curl -o gcc-9.2-bin.tar.gz http://prdownloads.sourceforge.net/hpc/gcc-9.2-bin.tar.gz
-gunzip gcc-9.2-bin.tar.gz
-sudo tar -xvf gcc-9.2-bin.tar -C /
-```
+        # Homebrew install (macOS)
+        brew cask install gcc gfortran
+
+        # direct install (macOS / linux)
+        curl -o gcc-9.2-bin.tar.gz http://prdownloads.sourceforge.net/hpc/gcc-9.2-bin.tar.gz
+        gunzip gcc-9.2-bin.tar.gz
+        sudo tar -xvf gcc-9.2-bin.tar -C /
+
 
 For Windows support, check [here](https://gcc.gnu.org/install/specific.html#windows).
 
@@ -68,9 +84,7 @@ Pylint and Autopep8 are used to enforce coding conventions.
 
 ## Deployment
 
-```sh
-python3 -m pip install autosys
-```
+        python3 -m pip install autosys
 
 ## Built With
 
@@ -94,11 +108,10 @@ See also the list of contributors who participated in this project.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
+AutoSys is licensed under the MIT <https://opensource.org/licenses/MIT> - see the [LICENSE](LICENSE) file for details.
 
-## System utilities for Python on macOS
 
-Setup and maintain python repos automatically
+
 ### Example Usage
 
 ### More Examples
@@ -107,4 +120,3 @@ Setup and maintain python repos automatically
 
 ### License
 
-AutoSys is licensed under the MIT <https://opensource.org/licenses/MIT>.
