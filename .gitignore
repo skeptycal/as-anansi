@@ -1,0 +1,14 @@
+*temp*
+*private*
+*bak*
+
+.gitconfig
+
+*.py[cod]
+*.egg-ignore
+*.egg-info
+__pycache__/
+build/
+dist/
+env/
+bak/

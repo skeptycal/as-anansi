@@ -1,0 +1,8 @@
+include LICENSE
+include poetry.lock
+include pyproject.toml
+include README.md
+include setup.cfg
+include setup.py
+include setup.sh
+
