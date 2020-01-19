@@ -74,7 +74,7 @@ python3 -m pip install autosys
 
 ## Built With
 
-![python on vscode](src/vscode_python.png)
+![python on vscode](images/vscode_python.png)
 
 
 ## Contributing
