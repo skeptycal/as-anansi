@@ -2,7 +2,7 @@ import sys
 import unittest
 from contextlib import contextmanager
 
-import antsy
+import as-anansi
 
 
 def print_demo():
