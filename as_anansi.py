@@ -11,16 +11,16 @@
 
     Options:
         FILE(s)                 Search pattern to match
-        -q, --quiet             suppress most error messages  [default: True]
-        -R --recursive          Perform search recursively    [default: False]
-        -v --verbose            Display detailed progress     [default: False]
-        -z, --zero              end each output line with NUL [default: False]
+        -q, --quiet             Suppress most error messages  [default: True]
+        -r, --recursive         Perform search recursively    [default: False]
+        -v, --verbose           Display detailed progress     [default: False]
+        -z, --zero              End each output line with NUL [default: False]
 
         -P PATTERN --pattern PATTERN    Pattern to highlight  [default: None]
 
         --version               Show version.
         --debug                 Show debug info and test results.
-        -h --help               Show this screen.
+        -h, --help              Show this screen.
 
     Exit status:
 
@@ -61,68 +61,40 @@
         css parsing, js library, 16bit color, 32bit color, etc.
 
      """
-# noqa: E731, E123, F401
-# flake8: noqa
 # - ------------------------ Imports
-if True:  # stupid VSCode formatting thing
-    from enum import Enum, auto
-    import os
-    import time
-    import re
-    import sys
-    from typing import Any, Iterator, List
-    if True:
-        try:
-            import ujson as json  # use faster version if available
-        except ImportError:
-            import json  # type: ignore
+from enum import Enum, auto
+import os
+import time
+import re
+import sys
+from typing import Any, Iterator, List
+if True:
+    try:
+        import ujson as json  # use faster version if available
+    except ImportError:
+        import json  # type: ignore
 
-# ------------------------------- Utilities
-
-# ------------------------------- GENERAL CONSTANTS
+# ------------------------------- CONSTANTS
+_SET_DEBUG: bool = True
 
 
-class GIX_STC:  # @v --> Structural Thinking Comments
-    # @context --> GIX STC DEKO Comments VSCode Addon
-    # @d --> https://github.com/GuillaumeIsabelleX/gixdeko-comments
-    # @d --> https://marketplace.visualstudio.com/items?itemName=GuillaumeIsabelle.gixdeko-comments
-    # @d --> https://www.youtube.com/watch?v=MnzKC24QvBI&list=PL0TcUolAT49gQ5tdyBvczwm3s-k3v02g4
+def dbprint(*args, db: bool = False, color: str = "\x1B[38;5;178m", sep='', file=sys.stderr, **kwargs):
+    ''' Prints debug messages if db flag is True.
 
-    ##########################################################################
-    # @vision -->
-    # @action -->
-    # @obs -->
-    # @cr -->
-    # // Strikethrough
-    # @status -->
-    # @question -->
-    # @issue -->
-    # @context -->
-    # @concept -->
-    # @data -->
-    # @bug -->
-    # @test -->
-    # @insight -->
-    # @due -->
-    # @mastery -->
-    # _	--> Separate code with visual // _ Different colored      ...
-    # -	--> Separate code with visual // -----Nice separator----- ...
-    # ###... Contrasted visual separator
+        - db - boolean flag for debug state
+        - color - keyword argument for print color. (default: Ansi.WARN)
 
-    # @v <s> standard
-    # @v <t> t
-    # @v <u> u
-    # @v <p> python
-    # @v <i> i
-    # @v <d> d
-    pass
+        Example:
+        ```py
+        if args[0] == '--version':
+            dbprint(f"{Ansi.MAIN}anansi.py{Ansi.RESET} version {__version__}.",
+                    db = _SET_DEBUG, end=f"<--debug{os.linesep}")
+        ```
 
-
-""" # ------------------------------- Color formatting
-    #p1 {background-color: #ff0000;}                /* red in HEX format */
-    #p2 {background-color: hsl(120, 100%, 50%);}    /* green in HSL format */
-    #p3 {background-color: rgba(0, 4, 255, 0.733);} /* blue with alpha channel in RGBA format */
-    """
+        '''
+    if _SET_DEBUG:
+        print(color, *args, Ansi.RESET,
+              end=f"<--debug{Ansi.NL}", file=file, **kwargs)
 
 # ------------------------------- Ansi Class
 
@@ -267,12 +239,12 @@ class Ansi(Enum):
         return True
 
 
-class AnsiUtilities(object):
+class AnsiUtilities(object):  # ? just object? maybe some more functionality?
     """ ANSI color magic 🦄  """
 
     def __init__(self):
-        self.load_colors()
         super().__init__()
+        self._load_colors()
 
     def encode_color_str(self,
                          fg: int = Ansi().DEFAULT_FG_CODE,
@@ -317,7 +289,7 @@ class AnsiUtilities(object):
             """
         return f"\x1b[38;5;4{color}m"
 
-    def load_colors(self):
+    def _load_colors(self):
         for _ in range(232):
             name = f'color{_}' if _ < 233 else f'grey{_}'
             value = self.fmt_CSI_8bit.format('3', _)
@@ -327,30 +299,7 @@ class AnsiUtilities(object):
             value = self.fmt_CSI_8bit.format('4', _)
             self.add_dynamic_method(name, value)
 
-# ------------------------ ANSI cursor controls
-
-    def loading(self, delay: float = 0.1, message: str = 'Loading ...', percent: bool = True):
-        """ ### Terminal progress Indicator
-
-            # Usage:
-
-                loading(delay: float = 0.1, message: str = 'Loading ...', percent: bool = True )
-
-
-                delay - delay between ticks
-                message - feedback shown during countdown (default: 'Loading...')
-                percent - display the '%' symbol
-
-            """
-        sp: str = '%'
-        if not percent:
-            sp = ''
-        print(message)
-        for i in range(0, 100):
-            time.sleep(delay)
-            sys.stdout.write("\x1B[1000D" + str(i + 1) + sp)
-            sys.stdout.flush()
-        print()
+    # ------------------------ ANSI cursor controls
 
     def move_to(self, L: int, C: int):
         """ Position the Cursor:
@@ -398,7 +347,7 @@ class AnsiUtilities(object):
             """
         print(f"\x1B2J")
 
-    def eof(self):
+    def eol(self):
         """ Erase to end of line:
 
                 <ESC>033[K
@@ -419,37 +368,41 @@ class AnsiUtilities(object):
             """
         print(f"\x1Bu")
 
+    def loading(self, delay: float = 0.1, message: str = 'Loading ...', percent: bool = True):
+        """ ### Terminal progress Indicator
 
-def dbprint(*args, db: bool = False, color: str = "\x1B[38;5;178m", sep='', end=Ansi.NL, file=sys.stderr, flush=False):
-    ''' Prints debug messages if db flag is True.
+            # Usage:
 
-        - db - boolean flag for debug state
-        - color - keyword argument for print color. (default: Ansi.WARN)
+                loading(delay: float = 0.1, message: str = 'Loading ...', percent: bool = True )
 
-        Example:
-        ```py
-        if args[0] == '--version':
-            dbprint(f"{Ansi.MAIN}anansi.py{Ansi.RESET} version {__version__}.",
-                    db = SET_DEBUG, end=f"<--debug{os.linesep}")
-        ```
 
-        '''
-    if db:
-        print(color, *args, Ansi.RESET, sep=sep,
-              end=f"<--debug{Ansi().NL}", file=file, flush=flush)
+                delay - delay between ticks
+                message - feedback shown during countdown (default: 'Loading...')
+                percent - display the '%' symbol
+
+            """
+        sp: str = '%'
+        if not percent:
+            sp = ''
+        print(message)
+        for i in range(0, 100):
+            time.sleep(delay)
+            sys.stdout.write("\x1B[1000D" + str(i + 1) + sp)
+            sys.stdout.flush()
+        print()
 
 
 def main(args):
     """ main loop - test ansi cli functions """
-    a = Ansi_Utilities()
+    a = AnsiUtilities()
     if len(sys.argv) > 1:
         args = sys.argv[1:]
     # dbprint(f"{args=}")
     dbprint(a.move_to(2, 3))
-    dbprint(f"{supports_color()=}")
+    dbprint(f"{Ansi.supports_color()=}")
     if len(args) > 0:
         if args[0] == '--debug':
-            SET_DEBUG = True
+            _SET_DEBUG = True
         if args[0] == '--version':
             print(f"{Ansi.MAIN}ansi.py{Ansi.RESET} version {__version__}.")
             # sys.exit(0)
@@ -474,3 +427,46 @@ if __name__ == "__main__":
 # Issue with Windows registry setting:
 #   https://stackoverflow.com/a/57154895
 #   File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/enum.py", line 221, in __new__
+
+
+class GIX_STC:  # @v --> Structural Thinking Comments
+    # @context --> GIX STC DEKO Comments VSCode Addon
+    # @d --> https://github.com/GuillaumeIsabelleX/gixdeko-comments
+    # @d --> https://marketplace.visualstudio.com/items?itemName=GuillaumeIsabelle.gixdeko-comments
+    # @d --> https://www.youtube.com/watch?v=MnzKC24QvBI&list=PL0TcUolAT49gQ5tdyBvczwm3s-k3v02g4
+
+    ##########################################################################
+    # @vision -->
+    # @action -->
+    # @obs -->
+    # @cr -->
+    # // Strikethrough
+    # @status -->
+    # @question -->
+    # @issue -->
+    # @context -->
+    # @concept -->
+    # @data -->
+    # @bug -->
+    # @test -->
+    # @insight -->
+    # @due -->
+    # @mastery -->
+    # _	--> Separate code with visual // _ Different colored      ...
+    # -	--> Separate code with visual // -----Nice separator----- ...
+    # ###... Contrasted visual separator
+
+    # @v <s> standard
+    # @v <t> t
+    # @v <u> u
+    # @v <p> python
+    # @v <i> i
+    # @v <d> d
+    pass
+
+
+""" # ------------------------------- Color formatting
+    # p1 {background-color: #ff0000;}                /* red in HEX format */
+    # p2 {background-color: hsl(120, 100%, 50%);}    /* green in HSL format */
+    # p3 {background-color: rgba(0, 4, 255, 0.733);} /* blue with alpha channel in RGBA format */
+    """
