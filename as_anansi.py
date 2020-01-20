@@ -77,6 +77,8 @@ if True:
 # ------------------------------- CONSTANTS
 _SET_DEBUG: bool = True
 
+# ------------------------------- Utilities
+
 
 def dbprint(*args, db: bool = False, color: str = "\x1B[38;5;178m", sep='', file=sys.stderr, **kwargs):
     ''' Prints debug messages if db flag is True.
@@ -94,13 +96,40 @@ def dbprint(*args, db: bool = False, color: str = "\x1B[38;5;178m", sep='', file
         '''
     if _SET_DEBUG:
         print(color, *args, Ansi.RESET,
-              end=f"<--debug{Ansi.NL}", file=file, **kwargs)
+              end=f"<--debug{Ansi.NL}", **kwargs)
+
+
+def is_a_tty():
+    ''' True if tty and stdout availale.
+
+        (from https://github.com/willyg302) '''
+    return hasattr(sys.stdout, 'isatty') and sys.stdout.isatty()
+
+
+def supports_color():
+    ''' True if the terminal supports color.
+
+        Sort of from Django.
+        (from https://github.com/willyg302)'''
+    if not is_a_tty():
+        return False
+    platform = sys.platform
+    if platform == 'Pocket PC':
+        return False
+    if platform == 'win32' and 'ANSICON' not in os.environ:
+        return False
+    return True
+
+
+SUPPORTS_COLOR: bool = supports_color()
+
 
 # ------------------------------- Ansi Class
 
 
-class Ansi(Enum):
+class Ansi(str, Enum):
     """ ANSI color magic 🦄  """
+# - Ansi color sets
     # - some favorites
     MAIN: str = "\x1B[38;5;229m"
     WARN: str = "\x1B[38;5;203m"
@@ -169,37 +198,39 @@ class Ansi(Enum):
     BBrightCyan: str = "\x1B[46;1m"
     BBrightWhite: str = "\x1B[47;1m"
 
-    # ------------------------ general constants
+# - Ansi general constants
     NL:     str = os.linesep    # -or- chr(10)  # newline character
     NUL:    str = chr(0)        # - NUL character
     BAK:    str = chr(8)        # - Backspace character
     TAB:    str = chr(9)        # - Horizontal Tab character
-    LF: str = chr(10)           # - Linefeed
+    LF:     str = chr(10)       # - Linefeed
 
-    ESC: str = '\x1B'           # - Escape
+    ESC:    str = '\x1B'        # - Escape
 
-    # ------------------------ ansi code constants
-    ANSI_SEP: str = ';'
-    CSI: str = ESC + '['  # - ANSI ECMA-48 Control Sequence Introducer
+# - Ansi code constants
+
+    CSI: str = ESC + '['           # - ANSI ECMA-48 Control Sequence Introducer
+    ANSI_SEP: str = ';'            # - ANSI ECMA-48 default separator
     CSI_8bit: str = CSI + '38;5;'  # - prefix for 256 color codes
-    SUFFIX: str = 'm'  # - suffix for ansi codes
-    SUPPORTS_COLOR: bool = self.ssupports_color()
+    SUFFIX: str = 'm'              # - suffix for ansi codes
 
-    # ------------------------ ansi format strings
+    # ------------------------ default ANSI values
+    DEFAULT_FG_CODE:        str = '229'
+    DEFAULT_BG_CODE:        str = '0'
+    DEFAULT_EFFECT_CODE:    str = '0'
+    DEFAULT_FG:             str = MAIN
+    DEFAULT_BG:             str = BBlack
+
+# -Ansi format strings
     # - {n} - format string for basic 4 bit ansi escape codess
     fmt_CSI: str = CSI + '{}m'
     # - {3,4}{0-255} - format string for 256 color codes
     # - 3 is foreground; 4 is background
     fmt_CSI_8bit: str = CSI_8bit + '{}{}m'
+    fmt_8bit_fg:  str = CSI_8bit + '3{}m'
+    fmt_8bit_bg:  str = CSI_8bit + '4{}m'
 
-    # ------------------------ default ANSI values
-    DEFAULT_FG_CODE:        int = 229
-    DEFAULT_BG_CODE:        int = 0
-    DEFAULT_EFFECT_CODE:    int = 0
-    DEFAULT_FG:             str = MAIN
-    DEFAULT_BG:             str = BBlack
-
-    def __init__(self):
+    def __init__(self, x):
         super().__init__()
         self._add_8bit()
 
@@ -209,34 +240,27 @@ class Ansi(Enum):
         def key_method(self, value=value):
             """ Dynamic method that returns <value>. """
             return value
-        setattr(self.__class__, name, value)
+        try:
+            setattr(self.__class__, name, value)
+        except Exception:
+            pass
 
-    def _add_8bit():
+    def _add_8bit(self):
         """ Create dynamic color methods for each ANSI 256 color codes. """
         for i in range(255):
             name = f"color{i}" if i < 233 else f"grey{i}"
-            self.add_dynamic_method(name, self.fg(i))
-            self.add_dynamic_method('bg' + name, self.bg(i))
+            self.add_dynamic_method(name, f"\x1b[38;5;3{i}m")
+            self.add_dynamic_method('bg' + name, f"\x1b[38;5;4{i}m")
 
-    def is_a_tty():
-        ''' True if tty and stdout availale.
+    def _load_colors(self):
+        for _ in range(232):
+            name = f'color{_}' if _ < 233 else f'grey{_}'
+            value = Ansi.fmt_CSI_8bit.format('3', _)
+            self.add_dynamic_method(name, value)
 
-            (from https://github.com/willyg302) '''
-        return hasattr(sys.stdout, 'isatty') and sys.stdout.isatty()
-
-    def supports_color():
-        ''' True if the terminal supports color.
-
-            Sort of from Django.
-            (from https://github.com/willyg302)'''
-        if not self.is_a_tty():
-            return False
-        platform = sys.platform
-        if platform == 'Pocket PC':
-            return False
-        if platform == 'win32' and 'ANSICON' not in os.environ:
-            return False
-        return True
+            name = f'bgcolor{_}' if _ < 233 else f'bggrey{_}'
+            value = self.fmt_CSI_8bit.format('4', _)
+            self.add_dynamic_method(name, value)
 
 
 class AnsiUtilities(object):  # ? just object? maybe some more functionality?
@@ -244,24 +268,23 @@ class AnsiUtilities(object):  # ? just object? maybe some more functionality?
 
     def __init__(self):
         super().__init__()
-        self._load_colors()
 
     def encode_color_str(self,
-                         fg: int = Ansi().DEFAULT_FG_CODE,
-                         bg: int = Ansi().DEFAULT_BG_CODE
+                         fg=Ansi.DEFAULT_FG_CODE,
+                         bg=Ansi.DEFAULT_BG_CODE
                          ):
         print(self.fg(fg), self.bg(bg))
 
     def encode_color_tuple(self,
-                           fg: int = Ansi().DEFAULT_FG_CODE,
-                           bg: int = Ansi().DEFAULT_BG_CODE,
-                           ef: int = Ansi().DEFAULT_EFFECT_CODE
+                           fg=Ansi.DEFAULT_FG_CODE,
+                           bg=Ansi.DEFAULT_BG_CODE,
+                           ef=Ansi.DEFAULT_EFFECT_CODE
                            ):
 
         print(self.encode(ef), self.bg(bg), self.fg(fg))
 
     def encode(self, ef: int = 0):
-        print(Ansi().fmt_CSI.format(ef))
+        print(Ansi.fmt_CSI.format(ef))
 
     def fg(self, color: int = 15) -> str:
         """ Encode ANSI 8-bit foreground color (default: 15)
@@ -274,7 +297,8 @@ class AnsiUtilities(object):  # ? just object? maybe some more functionality?
             - 16-231:  6×6×6 cube(216 colors) 16 + 36×r + 6×g + b(0 ≤ r, g, b ≤ 5)
             - 232-255: grayscale from black to white in 24 steps
             """
-        return f"\x1b[38;5;3{color}m"
+        return Ansi.fmt_CSI_8bit.format(3, color)
+        # f"\x1b[38;5;3{color}m"
 
     def bg(self, color: int = 0) -> str:
         """ Encode ANSI 8-bit background color (default: 0)
@@ -288,16 +312,6 @@ class AnsiUtilities(object):  # ? just object? maybe some more functionality?
             - 232-255: grayscale from black to white in 24 steps
             """
         return f"\x1b[38;5;4{color}m"
-
-    def _load_colors(self):
-        for _ in range(232):
-            name = f'color{_}' if _ < 233 else f'grey{_}'
-            value = self.fmt_CSI_8bit.format('3', _)
-            self.add_dynamic_method(name, value)
-
-            name = f'bgcolor{_}' if _ < 233 else f'bggrey{_}'
-            value = self.fmt_CSI_8bit.format('4', _)
-            self.add_dynamic_method(name, value)
 
     # ------------------------ ANSI cursor controls
 
@@ -399,7 +413,7 @@ def main(args):
         args = sys.argv[1:]
     # dbprint(f"{args=}")
     dbprint(a.move_to(2, 3))
-    dbprint(f"{Ansi.supports_color()=}")
+    dbprint(f"{supports_color()=}")
     if len(args) > 0:
         if args[0] == '--debug':
             _SET_DEBUG = True
