@@ -1,17 +1,38 @@
-*temp*
+# Project-specific files
+
+# general ignore files
 *private*
 *bak*
 
-.gitconfig
+# Python repo files
+.coveragerc
+.coveralls.yml
+.travis.yml
 
+# Python dev files
+.gitconfig
+.gitmodules
+.git*
+**.mypy_cache/
+**.pytest_cache/
+**.vscode/
+**dist-info/
+**egg-info/
+
+# Python build files
 *.py[cod]
 *.egg-ignore
 *.egg-info
 __pycache__/
-.mypy_cache/
-.pytest_cache/
-.vscode/
 build/
 dist/
 env/
-bak/
+
+# security
+.pypirc
+*history*
+*hist*
+config.py
+config.json
+sftp.json
+*/*.key

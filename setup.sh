@@ -44,21 +44,25 @@ _get_repo_template() {
     repo_template_location=~/Documents/coding/template
     repo_file_list=( README.md .gitignore LICENSE MANIFEST.in Pipfile setup.cfg setup.py )
     for f in $repo_file_list; do
-        echo "cp -rf" "${repo_template_location}/${f}" "$repo_path"
+        if [ -e "$f" ]; then
+            attn "$f already exists in the destination folder."
+        else
+            echo "cp -ri" "${repo_template_location}/${f}" "$repo_path" #! not activated ... remove <echo> ...
+        fi
     done
 
 
     # github repo template
     }
 _config() {
+    # Setup path names and constants
     [[ $SET_DEBUG == 1 ]] && _set_debug "$@"
     SHELL_BIN="${SHELL##*/}" && export SHELL_BIN
 
     repo_path=$PWD
-    dprintf "\$repo_path = $repo_path"
     repo_name=${PWD##*/}
+    dprintf "\$repo_path = $repo_path"
     dprintf "\$repo_name = $repo_name"
-
     }
 
 main() {
@@ -66,10 +70,15 @@ main() {
     br
     lime "**************************  Setup Github/Python repo **************************"
     _config "$@"
+    dprintf "\$repo_path = $repo_path"
+    dprintf "\$repo_name = $repo_name"
     _get_repo_template
     br
 
+    blue "Template location:"
     ls $repo_template_location
+    blue "Repo location:"
+    ls "$repo_path"
     _end_timer
 }
 
