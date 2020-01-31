@@ -1,3 +1,4 @@
+include __init__.py
 include .coveragerc
 include .gitignore
 include CHANGES.yml

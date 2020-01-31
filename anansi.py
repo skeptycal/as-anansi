@@ -57,6 +57,7 @@ if True:  # builtins
     from typing import Any, Iterator, List, Tuple
 
 if True:  # external
+    import anansi
     from docopt import docopt  # CLI interface
     try:
         import ujson as json  # use faster version if available
@@ -613,7 +614,6 @@ def _test_(args):
     # dbprint(' ... test')
     # dbprint(f"{SUPPORTS_COLOR=}")
     # dbprint(f"{platform=}")
-
     c = Color(15)
     print(c)
     print(dir(c))
